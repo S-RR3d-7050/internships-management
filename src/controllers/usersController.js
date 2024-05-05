@@ -1,6 +1,6 @@
 const { sendResponse } = require('../helpers/responseHelper');
 
-const { getUsersList, deleteUser, updateUser, updateUserRelatedRoleData } = require('../services/usersService');
+const { getUsersList, deleteUser, updateUser, updateUserRelatedRoleData, getUser } = require('../services/usersService');
 
 const getUsers = async (req, res) => {
     try {
@@ -53,9 +53,26 @@ const editUserRelatedRole = async (req, res) => {
     }
 }
 
+const getUserById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const user = await getUser(id);
+        if (user) {
+            return sendResponse(res, 200, true, 'User retrieved successfully', user);
+        }
+        return sendResponse(res, 404, false, 'User not found');
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+
+
+
 module.exports = {
     getUsers,
     removeUser,
     editUser,
-    editUserRelatedRole
+    editUserRelatedRole,
+    getUserById
 };

@@ -89,7 +89,10 @@ let loginUser = async (req, res) => {
 
         // user = await saveUserRefreshToken(user._id, refreshToken);
 
-        return sendResponse(res, 200, true, { accessToken }, 'User logged in successfully');
+        // remove the pass from user 
+        delete user.password;
+
+        return sendResponse(res, 200, true, { user, accessToken }, 'User logged in successfully');
     } catch (err) {
         console.log(err)
         res.status(500).send({"Error": "Internal Server Error"})

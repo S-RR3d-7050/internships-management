@@ -127,6 +127,17 @@ let updateUserRelatedRoleData = async (userId, relatedRoleData) => {
     }
 }
 
+// get user by id
+let getUser = async (email) => {
+    try {
+        const userRepository = getRepository(User);
+        const user = await userRepository.findOne({ where: { id } });
+        return user;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 
 
 
@@ -134,5 +145,6 @@ module.exports = {
     getUsersList,
     deleteUser,
     updateUser,
-    updateUserRelatedRoleData
+    updateUserRelatedRoleData,
+    getUser
 };
