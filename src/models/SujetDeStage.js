@@ -38,6 +38,11 @@ module.exports = new EntitySchema({
             type: "boolean",
             default: true,
         },
+        image: {
+            type: "varchar",
+            length: 255,
+            nullable: true
+        }
     },
     relations: {
         // Define relations here
@@ -51,7 +56,9 @@ module.exports = new EntitySchema({
         documents: {
             target: "Document",
             type: "one-to-many",
-            cascade: true
+            cascade: true,
+            joinColumn: true
+
         },
     }
 });

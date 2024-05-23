@@ -1,6 +1,6 @@
 const { sendResponse } = require('../helpers/responseHelper');
 
-const { getUsersList, deleteUser, updateUser, updateUserRelatedRoleData, getUser } = require('../services/usersService');
+const { getUsersList, deleteUser, updateUser, updateUserRelatedRoleData, getUser, getUserByRole, getUserEmail } = require('../services/usersService');
 
 const getUsers = async (req, res) => {
     try {
@@ -66,13 +66,36 @@ const getUserById = async (req, res) => {
     }
 }
 
+const getUserListByRole = async (req, res) => {
+    try {
+        const role = req.params.role;
+        const users = await getUserByRole(role);
+        return sendResponse(res, 200, true, 'Users retrieved successfully', users);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
 
-
+// get user by email
+const getUserByEmail = async (req, res) => {
+    try {
+        const email = req.params.email;
+        const user = await getUserEmail(email);
+        if (user) {
+            return sendResponse(res, 200, true, 'User retrieved successfully', user);
+        }
+        return sendResponse(res, 404, false, 'User not found');
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
 
 module.exports = {
     getUsers,
     removeUser,
     editUser,
     editUserRelatedRole,
-    getUserById
+    getUserById,
+    getUserListByRole,
+    getUserByEmail
 };

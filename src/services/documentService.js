@@ -59,6 +59,16 @@ let getSpeceficDemandeDeStageDocument = async (demandeDeStageId) => {
     }
 }
 
+let getSpeceficSujetDeStageDocument = async (sujetDeStageId) => {
+    try {
+        const documentRepository = getRepository(Document);
+        console.log("sujetDeStageId : ", sujetDeStageId);
+        return await documentRepository.findOne({ where: { relationShipId: sujetDeStageId, relationShipType: "SujetDeStage" } });
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 
 module.exports = {
     createDocument,
@@ -66,5 +76,6 @@ module.exports = {
     getDocumentsList,
     updateDocument,
     deleteDocument,
-    getSpeceficDemandeDeStageDocument
+    getSpeceficDemandeDeStageDocument,
+    getSpeceficSujetDeStageDocument
 };

@@ -42,6 +42,11 @@ module.exports = new EntitySchema({
         size: {
             type: "int",
             nullable: true
+        },
+        url: {
+            type: "varchar",
+            length: 255,
+            nullable: true
         }
     },
     relations: () => {

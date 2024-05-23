@@ -19,19 +19,12 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  // Get the file size
-  const fileSize = file.size;
-
   let ext = path.extname(file.originalname);
   if (ext !== ".pdf" && ext !== ".doc" && ext !== ".docx") {
     cb(new Error("File type is not supported"), false);
     return;
   }
-
-  // Pass the original name and size to the request object
-  req.uploadedFileName = file.originalname;
-  req.fileSize = fileSize;
-
+  
   cb(null, true);
 };
 

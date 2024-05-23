@@ -55,6 +55,14 @@ module.exports = new EntitySchema({
             cascade: true,
             inverseSide: "relationShipId", // Add this line to specify the inverse side
             joinColumn: true
+        },
+        // Add the relation with the encadrant
+        encadrant: {
+            target: "Encadrant",
+            type: "many-to-one",
+            joinColumn: true,
+            cascade: true,
+            nullable: true
         }
     }
 });

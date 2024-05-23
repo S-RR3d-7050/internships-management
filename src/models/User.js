@@ -53,6 +53,16 @@ module.exports = new EntitySchema({
       type: "int",
       nullable: true
     },
+    CIN: {
+      type: "varchar",
+      length: 8,
+    },
+    resetToken: {
+      type: "varchar",
+      length: 255,
+      nullable: true
+    },
+
   },
   relations: {
     // Define relations here

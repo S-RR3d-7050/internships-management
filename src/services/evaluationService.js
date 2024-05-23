@@ -48,11 +48,35 @@ let deleteEvaluation = async (id) => {
     }
 }
 
+// Get all evaluations of a specific student
+let getStudentEvaluations = async (studentId) => {
+    try {
+        const evaluationRepository = getRepository(Evaluation);
+        let ev =  await evaluationRepository.find({ relations: [ 'stagiaire'] });
+        return ev.filter(evaluation => evaluation.stagiaire.id == studentId);
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+// Get the last evaluation of a specific student
+let getLastStudentEvaluation = async (studentId) => {
+    try {
+        const evaluationRepository = getRepository(Evaluation);
+        let ev =  await evaluationRepository.find({ relations: [ 'stagiaire'] });
+        return ev.filter(evaluation => evaluation.stagiaire.id == studentId).sort((a, b) => b.createdAt - a.createdAt)[0];
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+
 module.exports = {
     createEvaluation,
     getEvaluation,
     getEvaluationsList,
     updateEvaluation,
-    deleteEvaluation
+    deleteEvaluation,
+    getStudentEvaluations,
+    getLastStudentEvaluation
 };
 

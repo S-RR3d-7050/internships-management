@@ -3,6 +3,7 @@ const User = require("../models/User"); // Make sure to adjust this path to your
 const Intern = require('../models/Intern');
 const Encadrant = require('../models/Encadrant');
 
+
 let createUser = async (data) => {
     try {
         const userRepository = getRepository(User);
@@ -183,6 +184,81 @@ let returnUserWithItsRelatedRole = async (userId, role) => {
     }
 };
 
+// get user by resetToken
+let getUserByResetToken = async (resetToken) => {
+    try {
+        const userRepository = getRepository(User);
+        let user = await userRepository.findOne({ where: { resetToken :resetToken } });
+        return user;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+// Generate a crypto random token for password reset
+let generateResetToken = async () => {
+    return require('crypto').randomBytes(20).toString('hex');
+}
+
+// Update user password
+let updateUserPasswordByToken = async (userToken, newPassword) => {
+    try {
+        const userRepository = getRepository(User);
+        let user = await getUserByResetToken(userToken)
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        user.password = newPassword;
+        // remove the reset token
+        user.resetToken = null;
+        return await userRepository.save(user);
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+// Update user to add the reset token
+let updateUserResetToken = async (userId, resetToken) => {
+    try {
+        const userRepository = getRepository(User);
+        let user = await userRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        /*
+        user = {
+            ...user,
+            resetToken: resetToken
+        }
+        */
+        user.resetToken = resetToken;
+        // Create an instance of the user
+
+        return await userRepository.save(user);
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+// Update user Password
+let updateUserPassword = async (userId, newPassword) => {
+    try {
+        const userRepository = getRepository(User);
+        let user = await userRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        user.password = newPassword;
+        user.resetToken = 'r';
+        return await userRepository.save(user);
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 module.exports = {
     createUser,
     getUser,
@@ -194,5 +270,9 @@ module.exports = {
     createIntern,
     createEncadrant,
     updateUserRelatedRoleId,
-    returnUserWithItsRelatedRole
+    returnUserWithItsRelatedRole,
+    getUserByResetToken,
+    updateUserPasswordByToken,
+    updateUserResetToken,
+    updateUserPassword
 }

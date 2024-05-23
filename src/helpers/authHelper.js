@@ -56,6 +56,12 @@ let validateUser = (user) => {
       role: Joi.string().valid(...Object.values(Role)).messages({
         "any.only": `Role must be one of the following: ${Object.values(Role).join(', ')}`
       }),
+      CIN: Joi.string().min(8).max(8).required().messages({
+        "any.required": "CIN is required",
+        "string.empty": "CIN is not allowed to be empty",
+        "string.min": "CIN length must be at least 8 characters long",
+        "string.max": "CIN length must be less than or equal to 8 characters long"
+      }),
     });
   
     return schema.validate(user);
@@ -71,6 +77,7 @@ let validateUser = (user) => {
     gender,
     role,
     password,
+    CIN
 }) => {
     // Simply create a new instance without saving it
     const userRepository = getRepository(User);
@@ -82,6 +89,7 @@ let validateUser = (user) => {
         gender,
         role,
         password,
+        CIN
     });
 
     // Return the new user instance without saving it to the database
@@ -98,6 +106,7 @@ let extractUserDataFromRequest = (req) => {
         gender: req.body.gender,
         role: req.body.role,
         password: req.body.password,
+        CIN: req.body.CIN
     }
 }
 
@@ -132,11 +141,16 @@ let assignModelBasedOnRole = async (role, userId) => {
         return null;
     }
 }
+
+let generateResetToken = async () => {
+  return require('crypto').randomBytes(20).toString('hex');
+}
   
 module.exports = {
     validateUser,
     initializeUser,
     extractUserDataFromRequest,
     verifyEmailAddresUniqueness,
-    assignModelBasedOnRole
+    assignModelBasedOnRole,
+    generateResetToken
 }

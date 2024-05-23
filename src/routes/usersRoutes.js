@@ -6,8 +6,9 @@ const {
     removeUser,
     editUser,
     editUserRelatedRole,
-    getUserById
-
+    getUserById,
+    getUserListByRole,
+    getUserByEmail
 } = require('../controllers/usersController');
 
 
@@ -16,5 +17,8 @@ router.delete(`/users/:id`, removeUser);
 router.put(`/users/:id`, editUser);
 router.put(`/users/:id/related-role`, editUserRelatedRole);
 router.get(`/users/:id`, getUserById);
+router.get(`/users/role/:role`, getUserListByRole);
+router.get(`/users/email/:email`, getUserByEmail)
+
 
 module.exports = router;

@@ -5,7 +5,8 @@ const {
     initializeUser,
     extractUserDataFromRequest,
     verifyEmailAddresUniqueness,
-    assignModelBasedOnRole
+    assignModelBasedOnRole,
+    generateResetToken
 } = require('../helpers/authHelper');
 
 const {
@@ -15,8 +16,12 @@ const {
     // checkForUserRefreshTokenAndRemoveIt,
     // getUserWithIdAndRefreshToken,
     updateUserRelatedRoleId,
-    returnUserWithItsRelatedRole
+    returnUserWithItsRelatedRole,
+    updateUserResetToken,
+    updateUserPassword,
 } = require('../services/authService');
+
+const { getUserByResetToken } = require('../services/authService');
 
 const {
     hashPassword,
@@ -29,6 +34,8 @@ const {
     // isTokenExpired,
     // verifyToken
 } = require('../helpers/tokenHelper');
+
+const { sendResetPasswordEmail, passwordChangedEmail, RespondToContactUs } = require("../config/mailerConfig");
 
 const signupUser = async (req, res) => {
     try {
@@ -100,53 +107,6 @@ let loginUser = async (req, res) => {
 }
 
 
-// let logoutUser = async (req, res) => {
-//     try {
-//         const user = req.user;
-//         const refreshToken = req.body.refreshToken;
-
-//         console.log(user._id, refreshToken)
-
-//         let t = await checkForUserRefreshTokenAndRemoveIt(user._id, refreshToken);
-//         console.log(t)
-
-//         return sendResponse(res, 200, true, null, 'User logged out successfully');
-//     } catch (err) {
-//         console.log(err)
-//         res.status(500).send({"Error": "Internal Server Error"})
-//     }
-// }
-
-
-// let handleRefreshAccessToken = async (req, res) => {
-//     try {
-//         const refreshToken = req.body.refreshToken;
-
-//         if (!refreshToken) {
-//             return sendResponse(res, 400, false, 'Refresh token is required');
-//         }
-
-//         if (isTokenExpired(refreshToken)) {
-//             return sendResponse(res, 400, false, 'Refresh token has expired');
-//         }
-
-//         const decoded = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-//         const user = decoded.UserInfo;
-
-//         const userWithToken = await getUserWithIdAndRefreshToken(user._id, refreshToken);
-//         if (!userWithToken) {
-//             return sendResponse(res, 400, false, 'Invalid refresh token');
-//         }
-
-//         const accessToken = generateAccessToken(userWithToken);
-
-//         return sendResponse(res, 200, true, { accessToken }, 'Access token refreshed successfully');
-//     } catch (err) {
-//         console.log(err)
-//         res.status(500).send({"Error": "Internal Server Error"})
-//     }
-// }
-
 let testIsAdmin = async (req, res) => {
     return sendResponse(res, 200, true, null, 'User is admin');
 }
@@ -156,6 +116,69 @@ let testIsFormer = async (req, res) => {
 }
 
 
+// Create Reset Password Controller here
+let resetPassword = async (req, res) => {
+    try {
+        const { token } = req.body;
+        const { password } = req.body;
+
+        const user = await getUserByResetToken(token);
+        if (!user) {
+            return sendResponse(res, 400, false, 'Invalid reset token');
+        }
+        // Hash the new password
+        const hashedPassword = await hashPassword(password);
+
+        // Update the user's password
+        await updateUserPassword(user.id, hashedPassword);
+        // Send email to user that password has been reset
+        passwordChangedEmail(user.email);
+
+        // Simulate resetting the password
+        return sendResponse(res, 200, true, null, 'Password has been reset successfully');
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({"Error": "Internal Server Error"});
+    }
+}
+
+// Create Forgot Password Controller here
+let forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await getUser(email);
+
+        if (!user) {
+            return sendResponse(res, 400, false, 'User not found');
+        }
+
+        const resetToken = await generateResetToken();
+        await updateUserResetToken(user.id, resetToken);
+        // Send email with reset token
+        sendResetPasswordEmail(email, resetToken);
+
+        // Simulate sending the reset token
+        return sendResponse(res, 200, true, { resetToken }, 'Reset token sent successfully');
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({"Error": "Internal Server Error"});
+    }
+}
+
+// Controller for handling Contact Us form submission
+ let contactUs = async (req, res) => {
+    try {
+        // Extract form data from request body
+        const { name, email, subject, message } = req.body;
+
+        // Simulate form submission
+        RespondToContactUs(name, email);
+        return sendResponse(res, 200, true, null, 'Your message has been sent successfully.');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({"Error": "Internal Server Error"});
+    }
+}
 
 
 module.exports = {
@@ -164,5 +187,8 @@ module.exports = {
     // logoutUser,
     // handleRefreshAccessToken,
     testIsAdmin,
-    testIsFormer
+    testIsFormer,
+    resetPassword,
+    forgotPassword,
+    contactUs
 }

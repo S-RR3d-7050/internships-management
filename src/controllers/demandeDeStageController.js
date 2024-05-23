@@ -6,7 +6,12 @@ const {
     getDemandeDeStagesList,
     updateDemandeDeStage,
     deleteDemandeDeStage,
-    demandeDeStageAddDocument
+    demandeDeStageAddDocument,
+    getDemandeDeStagesListWithStudentData,
+    getDemandeDeStagesByStudentId,
+    getDemandeDeStagesByStudentIdandData,
+    getDemandeDeStagesListByEtatDemande,
+    getDemandeDeStagesByEncadrantId,acceptDemandeDeStage,refuseDemandeDeStage
 } = require('../services/demandeDeStageService');
 
 
@@ -14,6 +19,9 @@ const { createDocument,
     updateDocument,
  } = require('../services/documentService');
 
+const {
+    getFileName
+} = require('../helpers/formatHelper');
 
 const addDemandeDeStage = async (req, res) => {
     try {
@@ -60,6 +68,27 @@ const updateDemandeDeStageById = async (req, res) => {
     }
 }
 
+const acceptDemandeDeStageControll = async (req, res) => {
+    try {
+        const demandeDeStageId = req.params.id;
+        const demandeDeStageData = req.body;
+        const updatedDemandeDeStage = await acceptDemandeDeStage(demandeDeStageId, demandeDeStageData);
+        return sendResponse(res, 200, true, 'Demande de stage accepted successfully', updatedDemandeDeStage);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+const refuseDemandeDeStageControll = async (req, res) => {
+    try {
+        const demandeDeStageId = req.params.id;
+        const updatedDemandeDeStage = await refuseDemandeDeStage(demandeDeStageId);
+        return sendResponse(res, 200, true, 'Demande de stage refused successfully', updatedDemandeDeStage);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
 const removeDemandeDeStage = async (req, res) => {
     try {
         const demandeDeStageId = req.params.id;
@@ -71,34 +100,80 @@ const removeDemandeDeStage = async (req, res) => {
 }
 
 const addDocumentToDemandeDeStage = async (req, res) => {
-    //file upload logic, req.file contains the file
     try {
         const demandeDeStageId = req.params.id;
-        // console.log(req.file);
-        // console.log(req.body);  
-        try {
-            const documentData = {
-                nom: req.file.originalname,
-                chemin: req.file.path,
-                extension: req.file.mimetype,
-                size: req.file.size
-            }
-            
-            console.log(documentData);
-            const addedDocument = await createDocument(documentData);
-            // const documentData = req.body;
-            const updatedDemandeDeStage = await demandeDeStageAddDocument(demandeDeStageId, documentData);
-            console.log(updatedDemandeDeStage);
-            addedDocument.relationShipId = updatedDemandeDeStage.id;
-            addedDocument.relationShipType = "DemandeDeStage";
+        
+        // Build the document data including the URL
+        const documentData = {
+            nom: req.file.originalname,
+            chemin: req.file.path,
+            extension: req.file.mimetype,
+            size: req.file.size,
+            url: `http://localhost:8000/${req.file.filename}` // Construct the file URL
+        };
+        
+        console.log(documentData);
+        
+        const addedDocument = await createDocument(documentData);
+        const updatedDemandeDeStage = await demandeDeStageAddDocument(demandeDeStageId, documentData);
+        
+        console.log(updatedDemandeDeStage);
+        
+        addedDocument.relationShipId = updatedDemandeDeStage.id;
+        addedDocument.relationShipType = "DemandeDeStage";
+        
+        updateDocument(addedDocument.id, addedDocument);
+        
+        return sendResponse(res, 200, true, 'Document added to demande de stage successfully', updatedDemandeDeStage);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
 
-            updateDocument(addedDocument.id, addedDocument);
-            
-            return sendResponse(res, 200, true, 'Document added to demande de stage successfully', updatedDemandeDeStage);
-        } catch (error) {
-            console.log(error);
-        }
-       
+const getDemandeDeStagesByStudentIdControll = async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const demandeDeStages = await getDemandeDeStagesByStudentId(studentId);
+        return sendResponse(res, 200, true, 'Demande de stages retrieved successfully', demandeDeStages);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+const getDemandeDeStagesListWithStudentDataControll = async (req, res) => {
+    try {
+        const demandeDeStages = await getDemandeDeStagesListWithStudentData();
+        return sendResponse(res, 200, true, 'Demande de stages retrieved successfully', demandeDeStages);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+const getDemandeDeStagesByStudentIdAndDataControll = async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const demandeDeStages = await getDemandeDeStagesByStudentIdandData(studentId);
+        return sendResponse(res, 200, true, 'Demande de stages retrieved successfully', demandeDeStages);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+const getDemandeDeStagesListByEtatDemandeControll = async (req, res) => {
+    try {
+        const etatDemande = req.params.etatDemande;
+        const demandeDeStages = await getDemandeDeStagesListByEtatDemande(etatDemande);
+        return sendResponse(res, 200, true, 'Demande de stages retrieved successfully', demandeDeStages);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+const getDemandeDeStagesByEncadrantIdControll = async (req, res) => {
+    try {
+        const encadrantId = req.params.id;
+        const demandeDeStages = await getDemandeDeStagesByEncadrantId(encadrantId);
+        return sendResponse(res, 200, true, 'Demande de stages retrieved successfully', demandeDeStages);
     } catch (error) {
         return sendResponse(res, 500, false, error.message);
     }
@@ -110,5 +185,13 @@ module.exports = {
     getDemandeDeStages,
     updateDemandeDeStageById,
     removeDemandeDeStage,
-    addDocumentToDemandeDeStage
+    addDocumentToDemandeDeStage,
+    getDemandeDeStagesListWithStudentDataControll,
+    getDemandeDeStagesByStudentIdControll,
+    getDemandeDeStagesByStudentIdAndDataControll,
+    getDemandeDeStagesListByEtatDemandeControll,
+    getDemandeDeStagesByEncadrantIdControll,
+    acceptDemandeDeStageControll,
+    refuseDemandeDeStageControll
+
 };

@@ -8,7 +8,7 @@ let getUsersList = async () => {
     try {
         const userRepository = getRepository(User);
         const users = await userRepository.find({
-            select: ['id', 'firstName', 'lastName', 'address', 'email', 'gender', 'role', 'relatedRoleId']
+            select: ['id', 'firstName', 'lastName', 'address', 'email', 'gender', 'role', 'relatedRoleId', 'resetToken']
         });
 
         const roleRepositoryMap = {
@@ -138,7 +138,28 @@ let getUser = async (email) => {
     }
 };
 
+let getUserEmail = async (email) => {
+    try {
+        const userRepository = getRepository(User);
+        const user = await userRepository.findOne({ where: { email }, select: ['id', 'firstName', 'lastName', 'email', 'role', 'address', 'CIN']});
+        return user;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
 
+// get user list by role
+let getUserByRole = async (role) => {
+    try {
+        const userRepository = getRepository(User);
+        // get all users with the specified role without their password
+        const users = await userRepository.find({ where: { role }, select: ['id', 'firstName', 'lastName', 'email', 'role', 'address', 'CIN'] });
+        //const users = await userRepository.find({ where: { role } });
+        return users;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
 
 module.exports = {
@@ -146,5 +167,7 @@ module.exports = {
     deleteUser,
     updateUser,
     updateUserRelatedRoleData,
-    getUser
+    getUser,
+    getUserByRole,
+    getUserEmail
 };

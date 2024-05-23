@@ -9,16 +9,34 @@ module.exports = new EntitySchema({
             type: "int",
             generated: true
         },
-        comments : {
+        comments: {
             type: "text",
             nullable: true
         },
-
+        qualityOfStudentInternshipReport: {
+            type: "varchar",
+            nullable: true
+        },
+        experienceGained: {
+            type: "varchar",
+            nullable: true
+        },
+        presentation: {
+            type: "varchar",
+            nullable: true
+        },
+        visualPresentationAid: {
+            type: "varchar",
+            nullable: true
+        },
+        overall: {
+            type: "varchar",
+            nullable: true
+        },
         note: {
             type: "int",
             nullable: true
         },
-
         createdAt: {
             type: "datetime",
             default: () => "CURRENT_TIMESTAMP"
@@ -26,7 +44,6 @@ module.exports = new EntitySchema({
     },
 
     relations: {
-        //Un Encadrant doit être associé à un seul User
         stagiaire: {
             target: "User",
             type: "many-to-one",

@@ -62,7 +62,13 @@ let updateTaskStatus = async (id, status) => {
 let getSpeceficStudentTasks = async (studentId) => {
     try {
         const taskRepository = getRepository(Task);
-        return await taskRepository.find({ where: { studentId } });
+        let tasks =  await taskRepository.find({ relations: ['encadrant' , 'student']});
+        // We need to map the tasks so we return only the tasks with studentId = studentId
+        //console.log(tasks);
+        //tasks = tasks.filter(task => task.student.id === studentId);
+        console.log('studentId From S' , studentId);
+        return tasks.filter(task => task.student.id == studentId);
+
     } catch (error) {
         throw new Error(error);
     }

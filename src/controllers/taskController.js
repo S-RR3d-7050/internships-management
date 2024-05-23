@@ -79,7 +79,8 @@ const updateTaskStatusById = async (req, res) => {
 
 const getStudentTasks = async (req, res) => {
     try {
-        const studentId = req.params.studentId;
+        const studentId = req.params.id;
+        console.log('studentId From C', studentId);
         const tasks = await getSpeceficStudentTasks(studentId);
         return sendResponse(res, 200, true, 'Student tasks retrieved successfully', tasks);
     } catch (error) {
