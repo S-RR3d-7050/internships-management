@@ -11,7 +11,7 @@ const {
     getDemandeDeStagesByStudentId,
     getDemandeDeStagesByStudentIdandData,
     getDemandeDeStagesListByEtatDemande,
-    getDemandeDeStagesByEncadrantId,acceptDemandeDeStage,refuseDemandeDeStage
+    getDemandeDeStagesByEncadrantId,acceptDemandeDeStage,refuseDemandeDeStage,isStagiaire
 } = require('../services/demandeDeStageService');
 
 
@@ -179,6 +179,20 @@ const getDemandeDeStagesByEncadrantIdControll = async (req, res) => {
     }
 }
 
+
+const defineIsStagiaire = async (req, res ) => {
+    try {
+        const studentId = req.params.id;
+        const demandeDeStages = await isStagiaire(studentId);
+        //req.isStagiaire = demandeDeStages;
+        //next();
+        return sendResponse(res, 200, true, 'Demande de stages retrieved successfully', demandeDeStages);
+    } catch (error) {
+        return sendResponse(res, 500, false, error.message);
+    }
+}
+
+
 module.exports = {
     addDemandeDeStage,
     getDemandeDeStageById,
@@ -192,6 +206,7 @@ module.exports = {
     getDemandeDeStagesListByEtatDemandeControll,
     getDemandeDeStagesByEncadrantIdControll,
     acceptDemandeDeStageControll,
-    refuseDemandeDeStageControll
+    refuseDemandeDeStageControll,
+    defineIsStagiaire
 
 };

@@ -14,7 +14,8 @@ const {
     getDemandeDeStagesListByEtatDemandeControll,
     getDemandeDeStagesByEncadrantIdControll,
     refuseDemandeDeStageControll,
-    acceptDemandeDeStageControll
+    acceptDemandeDeStageControll,
+    defineIsStagiaire
 } = require('../controllers/demandeDeStageController');
 const multerConfig = require('../config/multerConfig');
 
@@ -33,6 +34,7 @@ router.get(`/demandes-de-stage/etat/:etatDemande`, getDemandeDeStagesListByEtatD
 router.get(`/demandes-de-stage/encadrant/:id`, getDemandeDeStagesByEncadrantIdControll);
 router.put(`/demandes-de-stage/:id/refuse`, refuseDemandeDeStageControll);
 router.put(`/demandes-de-stage/:id/accept`, acceptDemandeDeStageControll);
+router.get(`/demandes-de-stage/is-stagiaire/:id`, defineIsStagiaire);
 
 
 

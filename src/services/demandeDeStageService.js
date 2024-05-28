@@ -181,6 +181,18 @@ let getDemandeDeStagesByEncadrantId = async (encadrantId) => {
 }
 
 
+// Define if that student is a stagiaire or not
+let isStagiaire = async (studentId) => {
+    try {
+        const demandeDeStageRepository = getRepository(DemandeDeStage);
+        let demandes = await demandeDeStageRepository.find({ where: { etat: 'ACCEPTEE' }, relations: ['encadrant', 'stagiaire', 'sujetDeStage'] });
+        demandes = demandes.filter(demande => demande.stagiaire.id == studentId);
+        return demandes.length > 0;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 module.exports = {
     createDemandeDeStage,
     getDemandeDeStage,
@@ -194,6 +206,7 @@ module.exports = {
     getDemandeDeStagesListByEtatDemande,
     getDemandeDeStagesByEncadrantId,
     acceptDemandeDeStage,
-    refuseDemandeDeStage
+    refuseDemandeDeStage,
+    isStagiaire
 
 }
