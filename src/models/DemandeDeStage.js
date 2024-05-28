@@ -58,7 +58,7 @@ module.exports = new EntitySchema({
         },
         // Add the relation with the encadrant
         encadrant: {
-            target: "Encadrant",
+            target: "User",
             type: "many-to-one",
             joinColumn: true,
             cascade: true,
